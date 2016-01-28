@@ -1,0 +1,24 @@
+[package]
+
+name = "glyphrast"
+version = "0.1.0"
+authors = ["Patrick Walton <pcwalton@mozilla.com>"]
+keywords = []
+description = "A simple OpenGL GPU glyph rasterizer"
+license = "MIT"
+repository = "https://github.com/pcwalton/glyphrast.git"
+homepage = "https://github.com/pcwalton/glyphrast"
+
+[lib]
+name = "glyphrast"
+path = "lib.rs"
+
+[[example]]
+name = "demo"
+path = "demo.rs"
+
+[dependencies]
+freetype-rs = "0.5"
+freetype-sys = "0.3"
+glium = "0.13"
+
