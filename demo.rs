@@ -59,16 +59,20 @@ pub fn main() {
         let mut target = display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
 
+        let glyph_raster_height = 24;
+
         let elapsed = TimeElapsedQuery::new(&display).unwrap();
         target.draw((&glyph_outline.vbo, EmptyInstanceAttributes {
-                        len: glyph_outline.width as usize,
+                        len: glyph_raster_height * 52,
                     }),
                     &NoIndices(PrimitiveType::Patches {
-                        vertices_per_patch: glyph_outline.vbo.len() as u16,
+                        vertices_per_patch: 16,
                     }),
                     &program,
                     &uniform! {
-                        uDimensions: (window_size.0 as f32, window_size.1 as f32),
+                        uWindowDimensions: (window_size.0 as f32, window_size.1 as f32),
+                        uGlyphHeight: glyph_outline.height as f32,
+                        uRasterHeight: glyph_raster_height as f32,
                         uCurveCount: glyph_outline.vbo.len() as i32,
                     },
                     &DrawParameters {

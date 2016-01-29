@@ -72,6 +72,9 @@ impl GlyphOutline {
                 add_curve(&mut patches, &mut last_point, &curve);
             }
         }
+        while patches.len() < 16 {
+            patches.push(Patch::line(&FT_Vector { x: 0, y: 0 }, &FT_Vector { x: 0, y: 0 }));
+        }
         let vbo = VertexBuffer::new(display, &patches).unwrap();
         GlyphOutline {
             patches: patches,

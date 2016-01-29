@@ -2,7 +2,7 @@
 
 layout(isolines) in;
 
-uniform vec2 uDimensions;
+uniform vec2 uWindowDimensions;
 
 in mat4 tcPoints[];
 out vec2 vEdges;
@@ -47,20 +47,20 @@ float GetEdge(int pointIndex) {
 }
 
 void main() {
-    int tessIndex = int(round(gl_TessCoord.y * float(gl_TessLevelOuter[0])));
-    if (tessIndex % 2 == 1) {
+    int tessIndex = int(round(gl_TessCoord.y * 16.0));
+    if (tessIndex % 2 == 0) {
         vEdges = vec2(GetEdge(tessIndex), GetEdge(tessIndex + 1));
         float x = gl_TessCoord.x == 0.0 ? vEdges.x : vEdges.y;
 
-        if (x >= 0.0) {
+        //if (x < 50000.0) {
             float y = gl_in[0].gl_Position.y;
-            gl_Position = vec4(mix(-1.0, 1.0, x / uDimensions.x),
-                               mix(-1.0, 1.0, y / uDimensions.y),
+            gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
+                               mix(-1.0, 1.0, y / uWindowDimensions.y),
                                0.0,
                                1.0);
-        } else {
+        /*} else {
             gl_Position = vec4(0.5, 0.5, 0.0, 1.0);
-        }
+        }*/
     } else {
         gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
     }
