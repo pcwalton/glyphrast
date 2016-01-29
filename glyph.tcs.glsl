@@ -2,22 +2,33 @@
 
 layout(vertices = 2) out;
 
-uniform float uWidth;
-uniform int uCurveCount;
-
-//in int vWindingCW[];
-
 out mat4 tcPoints[];
-//patch out float tcY;
-/*out TCData {
-    //float tcPoint0;
-    //float tcPoint1;
-    float tcY;
-} tcData[];*/
-//out float tcPoint0[];
-//out float tcPoint1[];
-//out float tcY[];
-//patch out int tcWindingsCW[16];
+
+#define ASSIGN_IF(n) \
+    if (pnext == n) \
+        p##n = ptmp;
+
+#define ASSIGN(n) \
+    ptmp = gl_in[n].gl_Position.x; \
+    if (ptmp < 100000.0) { \
+        ASSIGN_IF(0) \
+        else ASSIGN_IF(1) \
+        else ASSIGN_IF(2) \
+        else ASSIGN_IF(3) \
+        else ASSIGN_IF(4) \
+        else ASSIGN_IF(5) \
+        else ASSIGN_IF(6) \
+        else ASSIGN_IF(7) \
+        else ASSIGN_IF(8) \
+        else ASSIGN_IF(9) \
+        else ASSIGN_IF(10) \
+        else ASSIGN_IF(11) \
+        else ASSIGN_IF(12) \
+        else ASSIGN_IF(13) \
+        else ASSIGN_IF(14) \
+        else ASSIGN_IF(15) \
+        pnext++; \
+    }
 
 #define SWAP(a, b) \
     if (p##a > p##b) { \
@@ -31,26 +42,31 @@ void main() {
     if (gl_InvocationID != 0)
         return;
 
-    float p0 = gl_in[0].gl_Position.x;
-    float p1 = gl_in[1].gl_Position.x;
-    float p2 = gl_in[2].gl_Position.x;
-    float p3 = gl_in[3].gl_Position.x;
-    float p4 = gl_in[4].gl_Position.x;
-    float p5 = gl_in[5].gl_Position.x;
-    float p6 = gl_in[6].gl_Position.x;
-    float p7 = gl_in[7].gl_Position.x;
-    float p8 = gl_in[8].gl_Position.x;
-    float p9 = gl_in[9].gl_Position.x;
-    float p10 = gl_in[10].gl_Position.x;
-    float p11 = gl_in[11].gl_Position.x;
-    float p12 = gl_in[12].gl_Position.x;
-    float p13 = gl_in[13].gl_Position.x;
-    float p14 = gl_in[14].gl_Position.x;
-    float p15 = gl_in[15].gl_Position.x;
+    float p0 = 100000.0, p1 = 100000.0, p2 = 100000.0, p3 = 100000.0;
+    float p4 = 100000.0, p5 = 100000.0, p6 = 100000.0, p7 = 100000.0;
+    float p8 = 100000.0, p9 = 100000.0, p10 = 100000.0, p11 = 100000.0;
+    float p12 = 100000.0, p13 = 100000.0, p14 = 100000.0, p15 = 100000.0;
+    int pnext = 0;
+    float ptmp;
+    ASSIGN(0);
+    ASSIGN(1);
+    ASSIGN(2);
+    ASSIGN(3);
+    ASSIGN(4);
+    ASSIGN(5);
+    ASSIGN(6);
+    ASSIGN(7);
+    ASSIGN(8);
+    ASSIGN(9);
+    ASSIGN(10);
+    ASSIGN(11);
+    ASSIGN(12);
+    ASSIGN(13);
+    ASSIGN(14);
+    ASSIGN(15);
 
     // Bose-Nelson sorting network algorithm to work around driver bugs.
     int count = 16;
-    float ptmp;
     SWAP(0, 1);
     SWAP(2, 3);
     SWAP(0, 2);

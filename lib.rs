@@ -24,11 +24,11 @@ pub static RESOLUTION_VERTEX_SHADER: &'static str = include_str!("resolve.vs.gls
 
 const MAX_TEX_GEN_LEVEL: i32 = 32;
 
-pub struct GlyphOutline {
+pub struct GlyphOutlines {
     pub patches: Vec<Patch>,
-    pub vbo: VertexBuffer<Patch>,
-    pub width: i32,
-    pub height: i32,
+    pub outlines_vbo: VertexBuffer<Patch>,
+    pub metadata_vbo: VertexBuffer<GlyphMetadata>,
+    pub dimensions: Vec<(i32, i32)>,
 }
 
 fn add_curve(patches: &mut Vec<Patch>, p0: &mut FT_Vector, curve: &Curve) {
@@ -55,32 +55,64 @@ fn add_curve(patches: &mut Vec<Patch>, p0: &mut FT_Vector, curve: &Curve) {
     }
 }
 
-impl GlyphOutline {
-    pub fn build(display: &Display, face: Face) -> GlyphOutline {
-        let glyph = face.glyph();
-        let metrics = glyph.metrics();
-        let xmin = metrics.horiBearingX - 5;
-        let width = metrics.width + 10;
-        let ymin = -metrics.horiBearingY - 5;
-        let height = metrics.height + 10;
-        let outline = glyph.outline().unwrap();
-
+impl GlyphOutlines {
+    pub fn build(display: &Display, parameters: &[GlyphParameters]) -> GlyphOutlines {
         let mut patches = vec![];
-        for contour in outline.contours_iter() {
-            let mut last_point = *contour.start();
-            for curve in contour {
-                add_curve(&mut patches, &mut last_point, &curve);
+        let mut metadata = vec![];
+        let mut dimensions = vec![];
+        for parameters in parameters {
+            let glyph = parameters.face.glyph();
+            let metrics = glyph.metrics();
+            let xmin = metrics.horiBearingX - 5;
+            let width = metrics.width + 10;
+            let ymin = -metrics.horiBearingY - 5;
+            let height = metrics.height + 10;
+            let outline = glyph.outline().unwrap();
+
+            let patches_target_size = patches.len() + 32;
+            //'outer: for contour in outline.contours_iter() {
+            {
+                let contour = outline.contours_iter().next().unwrap();
+                let mut last_point = *contour.start();
+                for curve in contour {
+                    if patches.len() >= patches_target_size {
+                        break
+                    }
+                    add_curve(&mut patches, &mut last_point, &curve);
+                }
             }
+
+            let mut counts = vec![];
+            'outer: for contour in outline.contours_iter() {
+                let mut count = 0;
+                for curve in contour {
+                    count += 1;
+                }
+                counts.push(count)
+            }
+            println!("counts={:?}", counts);
+
+            while patches.len() < patches_target_size {
+                patches.push(Patch::line(&FT_Vector { x: 0, y: 0 }, &FT_Vector { x: 0, y: 0 }));
+            }
+            for _ in 0..32 {
+                metadata.push(GlyphMetadata {
+                    aGlyphHeight: height as f32,
+                    aRasterOrigin: parameters.raster_origin,
+                    aRasterHeight: parameters.raster_height,
+                    aCurveCount: 16,
+                });
+            }
+            dimensions.push((width as i32, height as i32));
         }
-        while patches.len() < 16 {
-            patches.push(Patch::line(&FT_Vector { x: 0, y: 0 }, &FT_Vector { x: 0, y: 0 }));
-        }
-        let vbo = VertexBuffer::new(display, &patches).unwrap();
-        GlyphOutline {
+
+        let outlines_vbo = VertexBuffer::new(display, &patches).unwrap();
+        let metadata_vbo = VertexBuffer::new(display, &metadata).unwrap();
+        GlyphOutlines {
             patches: patches,
-            vbo: vbo,
-            width: width as i32,
-            height: height as i32,
+            outlines_vbo: outlines_vbo,
+            metadata_vbo: metadata_vbo,
+            dimensions: dimensions,
         }
     }
 }
@@ -132,5 +164,21 @@ impl ToTuple for FT_Vector {
     fn to_tuple(&self) -> (i32, i32) {
         (self.x as i32, self.y as i32)
     }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct GlyphMetadata {
+    pub aGlyphHeight: f32,
+    pub aRasterOrigin: [f32; 2],
+    pub aRasterHeight: f32,
+    pub aCurveCount: i32,
+}
+
+implement_vertex!(GlyphMetadata, aGlyphHeight, aRasterOrigin, aRasterHeight, aCurveCount);
+
+pub struct GlyphParameters<'a> {
+    pub face: Face<'a>,
+    pub raster_height: f32,
+    pub raster_origin: [f32; 2],
 }
 
