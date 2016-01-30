@@ -26,7 +26,7 @@ const MAX_TEX_GEN_LEVEL: i32 = 32;
 
 pub struct GlyphOutlines {
     pub patches: Vec<Patch>,
-    pub outlines_vbo: VertexBuffer<Patch>,
+    pub outlines_vbo: VertexBuffer<PatchVertex>,
     pub metadata_vbo: VertexBuffer<GlyphMetadata>,
     pub dimensions: Vec<(i32, i32)>,
 }
@@ -36,19 +36,21 @@ fn add_curve(patches: &mut Vec<Patch>, p0: &mut FT_Vector, curve: &Curve) {
         Curve::Line(ref p1) => {
             let y_min = cmp::min(p0.y as i32, p1.y as i32);
             let y_max = cmp::max(p0.y as i32, p1.y as i32);
-            //println!("line {:?} {:?}", p0.to_tuple(), p1.to_tuple());
+            println!("line {:?} {:?}", p0.to_tuple(), p1.to_tuple());
             patches.push(Patch::line(p0, p1));
             *p0 = *p1
         }
         Curve::Bezier2(ref p1, ref p2) => {
             let y_min = cmp::min(p0.y as i32, p2.y as i32);
             let y_max = cmp::max(p0.y as i32, p2.y as i32);
+            println!("bezier2 {:?} {:?}", p0.to_tuple(), p2.to_tuple());
             patches.push(Patch::quadratic(p0, p1, p2));
             *p0 = *p2
         }
         Curve::Bezier3(ref p1, ref p2, ref p3) => {
             let y_min = cmp::min(p0.y as i32, p3.y as i32);
             let y_max = cmp::max(p0.y as i32, p3.y as i32);
+            println!("bezier3 {:?} {:?}", p0.to_tuple(), p3.to_tuple());
             patches.push(Patch::cubic(p0, p1, p2, p3));
             *p0 = *p3
         }
@@ -69,13 +71,13 @@ impl GlyphOutlines {
             let height = metrics.height + 10;
             let outline = glyph.outline().unwrap();
 
-            let patches_target_size = patches.len() + 32;
-            //'outer: for contour in outline.contours_iter() {
-            {
-                let contour = outline.contours_iter().next().unwrap();
+            let patches_target_size = patches.len() + 64;
+            let mut k = 0;
+            for contour in outline.contours_iter() {
                 let mut last_point = *contour.start();
                 for curve in contour {
                     if patches.len() >= patches_target_size {
+                        println!("--- broken!");
                         break
                     }
                     add_curve(&mut patches, &mut last_point, &curve);
@@ -100,13 +102,28 @@ impl GlyphOutlines {
                     aGlyphHeight: height as f32,
                     aRasterOrigin: parameters.raster_origin,
                     aRasterHeight: parameters.raster_height,
-                    aCurveCount: 16,
+                    aCurveCount: 32,
                 });
             }
             dimensions.push((width as i32, height as i32));
         }
 
-        let outlines_vbo = VertexBuffer::new(display, &patches).unwrap();
+        let mut patch_vertices = vec![];
+        for i in 0..(patches.len() / 2) {
+            patch_vertices.push(PatchVertex {
+                aAP0: patches[i*2+0].aP0,
+                aAP1: patches[i*2+0].aP1,
+                aAP2: patches[i*2+0].aP2,
+                aAP3: patches[i*2+0].aP3,
+                aBP0: patches[i*2+1].aP0,
+                aBP1: patches[i*2+1].aP1,
+                aBP2: patches[i*2+1].aP2,
+                aBP3: patches[i*2+1].aP3,
+            })
+        }
+        println!("{} patches -> {} patch vertices", patches.len(), patch_vertices.len());
+
+        let outlines_vbo = VertexBuffer::new(display, &patch_vertices).unwrap();
         let metadata_vbo = VertexBuffer::new(display, &metadata).unwrap();
         GlyphOutlines {
             patches: patches,
@@ -118,14 +135,26 @@ impl GlyphOutlines {
 }
 
 #[derive(Copy, Clone, Debug)]
+pub struct PatchVertex {
+    pub aAP0: (i32, i32),
+    pub aAP1: (i32, i32),
+    pub aAP2: (i32, i32),
+    pub aAP3: (i32, i32),
+    pub aBP0: (i32, i32),
+    pub aBP1: (i32, i32),
+    pub aBP2: (i32, i32),
+    pub aBP3: (i32, i32),
+}
+
+implement_vertex!(PatchVertex, aAP0, aAP1, aAP2, aAP3, aBP0, aBP1, aBP2, aBP3);
+
+#[derive(Copy, Clone, Debug)]
 pub struct Patch {
     pub aP0: (i32, i32),
     pub aP1: (i32, i32),
     pub aP2: (i32, i32),
     pub aP3: (i32, i32),
 }
-
-implement_vertex!(Patch, aP0, aP1, aP2, aP3);
 
 impl Patch {
     fn line(p0: &FT_Vector, p1: &FT_Vector) -> Patch {

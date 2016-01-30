@@ -22,11 +22,14 @@ use glyphrast::{GLYPH_TESSELLATION_EVALUATION_SHADER, GLYPH_VERTEX_SHADER, Glyph
 use glyphrast::{GlyphMetadata, GlyphParameters};
 use std::env;
 
-//static STRING: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-static STRING: &'static str = "ABBDEFFHIJKLMNOPQQQTTVVXYZZbbdeeehijklllopqrrrrvvxyz";
-//static STRING: &'static str = "B";
+static STRING: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+//static STRING: &'static str = "AACDEFGHIJKLMNOPQRRTUVWXYZZbbdefghijklmnopqrrtuvwxyz";
+//static STRING: &'static str = "s";
 
-const RASTER_HEIGHT: f32 = 24.0;
+// bad: BSas (S has 35 -- maybe related?)
+
+const RASTER_HEIGHT: f32 = 30.0;
+//const RASTER_HEIGHT: f32 = 1000.0;
 
 pub fn main() {
     let ref mut args = env::args();

@@ -51,16 +51,11 @@ void main() {
     if (tessIndex % 2 == 0) {
         vEdges = vec2(GetEdge(tessIndex), GetEdge(tessIndex + 1));
         float x = gl_TessCoord.x == 0.0 ? vEdges.x : vEdges.y;
-
-        //if (x < 50000.0) {
-            float y = gl_in[0].gl_Position.y;
-            gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
-                               mix(-1.0, 1.0, y / uWindowDimensions.y),
-                               0.0,
-                               1.0);
-        /*} else {
-            gl_Position = vec4(0.5, 0.5, 0.0, 1.0);
-        }*/
+        float y = gl_in[0].gl_Position.y;
+        gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
+                           mix(-1.0, 1.0, y / uWindowDimensions.y),
+                           0.0,
+                           1.0);
     } else {
         gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
     }

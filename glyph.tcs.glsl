@@ -8,8 +8,7 @@ out mat4 tcPoints[];
     if (pnext == n) \
         p##n = ptmp;
 
-#define ASSIGN(n) \
-    ptmp = gl_in[n].gl_Position.x; \
+#define ASSIGN_TMP() \
     if (ptmp < 100000.0) { \
         ASSIGN_IF(0) \
         else ASSIGN_IF(1) \
@@ -30,6 +29,12 @@ out mat4 tcPoints[];
         pnext++; \
     }
 
+#define ASSIGN(n) \
+    ptmp = gl_in[n].gl_Position.x; \
+    ASSIGN_TMP(); \
+    ptmp = gl_in[n].gl_Position.z; \
+    ASSIGN_TMP();
+
 #define SWAP(a, b) \
     if (p##a > p##b) { \
         ptmp = p##a; \
@@ -38,7 +43,7 @@ out mat4 tcPoints[];
     }
 
 void main() {
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    gl_out[gl_InvocationID].gl_Position = vec4(gl_in[gl_InvocationID].gl_Position.xy, 0.0, 1.0);
     if (gl_InvocationID != 0)
         return;
 
@@ -64,9 +69,24 @@ void main() {
     ASSIGN(13);
     ASSIGN(14);
     ASSIGN(15);
+    ASSIGN(16);
+    ASSIGN(17);
+    ASSIGN(18);
+    ASSIGN(19);
+    ASSIGN(20);
+    ASSIGN(21);
+    ASSIGN(22);
+    ASSIGN(23);
+    ASSIGN(24);
+    ASSIGN(25);
+    ASSIGN(26);
+    ASSIGN(27);
+    ASSIGN(28);
+    ASSIGN(29);
+    ASSIGN(30);
+    ASSIGN(31);
 
     // Bose-Nelson sorting network algorithm to work around driver bugs.
-    int count = 16;
     SWAP(0, 1);
     SWAP(2, 3);
     SWAP(0, 2);
