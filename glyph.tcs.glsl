@@ -86,7 +86,8 @@ void main() {
     ASSIGN(30);
     ASSIGN(31);
 
-    // Bose-Nelson sorting network algorithm to work around driver bugs.
+    // Bose-Nelson sorting network algorithm. Seems to be faster than a traditional sort on the
+    // GPU.
     SWAP(0, 1);
     SWAP(2, 3);
     SWAP(0, 2);

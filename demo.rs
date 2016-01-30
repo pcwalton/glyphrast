@@ -24,7 +24,7 @@ use std::env;
 
 static STRING: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 //static STRING: &'static str = "AACDEFGHIJKLMNOPQRRTUVWXYZZbbdefghijklmnopqrrtuvwxyz";
-//static STRING: &'static str = "s";
+//static STRING: &'static str = "C";
 
 // bad: BSas (S has 35 -- maybe related?)
 
