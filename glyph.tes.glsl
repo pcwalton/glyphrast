@@ -51,20 +51,21 @@ float GetOpacity(float encodedPoint) {
 
 void main() {
     int tessIndex = int(round(gl_TessCoord.y * float(gl_TessLevelOuter[0])));
-    if (tessIndex % 2 == 0) {
-        float encodedPoint0 = GetEncodedPoint(tessIndex);
-        float encodedPoint1 = GetEncodedPoint(tessIndex + 1);
-        vAAResult = vec3(GetLocation(encodedPoint0),
-                         GetLocation(encodedPoint1),
-                         GetOpacity(encodedPoint0));
-        float x = gl_TessCoord.x == 0.0 ? vAAResult.x : vAAResult.y;
-        float y = gl_in[0].gl_Position.y;
-        gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
-                           mix(-1.0, 1.0, y / uWindowDimensions.y),
-                           0.0,
-                           1.0);
-    } else {
+    if (tessIndex % 2 != 0) {
         gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
     }
+
+    float encodedPoint0 = GetEncodedPoint(tessIndex);
+    float encodedPoint1 = GetEncodedPoint(tessIndex + 1);
+    vAAResult = vec3(GetLocation(encodedPoint0),
+                     GetLocation(encodedPoint1),
+                     GetOpacity(encodedPoint0));
+    float x = gl_TessCoord.x == 0.0 ? vAAResult.x : vAAResult.y;
+    float y = gl_in[0].gl_Position.y;
+    gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
+                       mix(-1.0, 1.0, y / uWindowDimensions.y),
+                       0.0,
+                       1.0);
 }
 

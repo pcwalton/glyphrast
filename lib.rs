@@ -36,21 +36,21 @@ fn add_curve(patches: &mut Vec<Patch>, p0: &mut FT_Vector, curve: &Curve) {
         Curve::Line(ref p1) => {
             let y_min = cmp::min(p0.y as i32, p1.y as i32);
             let y_max = cmp::max(p0.y as i32, p1.y as i32);
-            println!("line {:?} {:?}", p0.to_tuple(), p1.to_tuple());
+            //println!("line {:?} {:?}", p0.to_tuple(), p1.to_tuple());
             patches.push(Patch::line(p0, p1));
             *p0 = *p1
         }
         Curve::Bezier2(ref p1, ref p2) => {
             let y_min = cmp::min(p0.y as i32, p2.y as i32);
             let y_max = cmp::max(p0.y as i32, p2.y as i32);
-            println!("bezier2 {:?} {:?}", p0.to_tuple(), p2.to_tuple());
+            //println!("bezier2 {:?} {:?}", p0.to_tuple(), p2.to_tuple());
             patches.push(Patch::quadratic(p0, p1, p2));
             *p0 = *p2
         }
         Curve::Bezier3(ref p1, ref p2, ref p3) => {
             let y_min = cmp::min(p0.y as i32, p3.y as i32);
             let y_max = cmp::max(p0.y as i32, p3.y as i32);
-            println!("bezier3 {:?} {:?}", p0.to_tuple(), p3.to_tuple());
+            //println!("bezier3 {:?} {:?}", p0.to_tuple(), p3.to_tuple());
             patches.push(Patch::cubic(p0, p1, p2, p3));
             *p0 = *p3
         }
@@ -77,7 +77,7 @@ impl GlyphOutlines {
                 let mut last_point = *contour.start();
                 for curve in contour {
                     if patches.len() >= patches_target_size {
-                        println!("--- broken!");
+                        println!("Out of patch vertices! Expect broken glyphs.");
                         break
                     }
                     add_curve(&mut patches, &mut last_point, &curve);
@@ -92,7 +92,7 @@ impl GlyphOutlines {
                 }
                 counts.push(count)
             }
-            println!("counts={:?}", counts);
+            //println!("counts={:?}", counts);
 
             while patches.len() < patches_target_size {
                 patches.push(Patch::line(&FT_Vector { x: 0, y: 0 }, &FT_Vector { x: 0, y: 0 }));
@@ -121,7 +121,7 @@ impl GlyphOutlines {
                 aBP3: patches[i*2+1].aP3,
             })
         }
-        println!("{} patches -> {} patch vertices", patches.len(), patch_vertices.len());
+        //println!("{} patches -> {} patch vertices", patches.len(), patch_vertices.len());
 
         let outlines_vbo = VertexBuffer::new(display, &patch_vertices).unwrap();
         let metadata_vbo = VertexBuffer::new(display, &metadata).unwrap();
