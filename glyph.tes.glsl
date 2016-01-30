@@ -5,14 +5,9 @@ layout(isolines) in;
 uniform vec2 uWindowDimensions;
 
 in mat4 tcPoints[];
-out vec2 vEdges;
-//patch in float tcY;
-//in float tcPoint0[]; 
-//in float tcPoint1[];
-//in float tcY[];
-//patch in int tcWindingsCW[16];
+out vec3 vAAResult;
 
-float GetEdge(int pointIndex) {
+float GetEncodedPoint(int pointIndex) {
     if (pointIndex == 0)
         return tcPoints[0][0].x;
     if (pointIndex == 1)
@@ -46,11 +41,23 @@ float GetEdge(int pointIndex) {
     return tcPoints[0][3].w;
 }
 
+float GetLocation(float encodedPoint) {
+    return floor(encodedPoint / 32.0) / 16.0;
+}
+
+float GetOpacity(float encodedPoint) {
+    return floor(mod(encodedPoint, 32.0) / 2.0) / 15.0;
+}
+
 void main() {
     int tessIndex = int(round(gl_TessCoord.y * float(gl_TessLevelOuter[0])));
     if (tessIndex % 2 == 0) {
-        vEdges = vec2(GetEdge(tessIndex), GetEdge(tessIndex + 1));
-        float x = gl_TessCoord.x == 0.0 ? vEdges.x : vEdges.y;
+        float encodedPoint0 = GetEncodedPoint(tessIndex);
+        float encodedPoint1 = GetEncodedPoint(tessIndex + 1);
+        vAAResult = vec3(GetLocation(encodedPoint0),
+                         GetLocation(encodedPoint1),
+                         GetOpacity(encodedPoint0));
+        float x = gl_TessCoord.x == 0.0 ? vAAResult.x : vAAResult.y;
         float y = gl_in[0].gl_Position.y;
         gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
                            mix(-1.0, 1.0, y / uWindowDimensions.y),

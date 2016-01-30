@@ -30,7 +30,7 @@ float RasterX(vec2 p0, vec2 p1, vec2 p3, float glyphY) {
         return x + aRasterOrigin.x;
     }
 
-    return 100000.0;
+    return 2500000.0;
 }
 
 void main() {
@@ -56,9 +56,9 @@ void main() {
     vec2 bp2 = aBP2 * scaleFactor;
     vec2 bp3 = aBP3 * scaleFactor;
 
-    float rasterAX = RasterX(ap0, ap1, ap3, glyphY);
-    float rasterBX = RasterX(bp0, bp1, bp3, glyphY);
-    gl_Position = vec4(rasterAX, rasterY, rasterBX, 1.0);
+    float encodedRasterAX = round(RasterX(ap0, ap1, ap3, glyphY) * 16.0) * 32.0 + 31.0;
+    float encodedRasterBX = round(RasterX(bp0, bp1, bp3, glyphY) * 16.0) * 32.0 + 31.0;
+    gl_Position = vec4(encodedRasterAX, rasterY, encodedRasterBX, 1.0);
     //vWindingCW = aP3.y >= aP0.y ? 1 : 0;
 }
 
