@@ -52,7 +52,7 @@ void main() {
     vec2 bp2 = aBP2 * scaleFactor;
     vec2 bp3 = aBP3 * scaleFactor;
 
-    // TODO(pcwalton): Use the last bit to encode rounding order.
+    // TODO(pcwalton): Use the last bit to encode winding.
     float encodedRasterAX = round(RasterX(ap0, ap1, ap3, glyphY) * 16.0) * 32.0 + 31.0;
     float encodedRasterBX = round(RasterX(bp0, bp1, bp3, glyphY) * 16.0) * 32.0 + 31.0;
     gl_Position = vec4(encodedRasterAX, rasterY, encodedRasterBX, 1.0);
