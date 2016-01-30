@@ -47,7 +47,7 @@ float GetEdge(int pointIndex) {
 }
 
 void main() {
-    int tessIndex = int(round(gl_TessCoord.y * 16.0));
+    int tessIndex = int(round(gl_TessCoord.y * float(gl_TessLevelOuter[0])));
     if (tessIndex % 2 == 0) {
         vEdges = vec2(GetEdge(tessIndex), GetEdge(tessIndex + 1));
         float x = gl_TessCoord.x == 0.0 ? vEdges.x : vEdges.y;

@@ -162,7 +162,7 @@ void main() {
     tcPoints[0][2] = vec4(p8, p9, p10, p11);
     tcPoints[0][3] = vec4(p12, p13, p14, p15);
 
-    gl_TessLevelOuter[0] = 16;
+    gl_TessLevelOuter[0] = min(pnext, 16);
     gl_TessLevelOuter[1] = 1;
 }
 
