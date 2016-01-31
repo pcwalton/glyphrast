@@ -19,8 +19,6 @@ pub static GLYPH_FRAGMENT_SHADER: &'static str = include_str!("glyph.fs.glsl");
 pub static GLYPH_TESSELLATION_CONTROL_SHADER: &'static str = include_str!("glyph.tcs.glsl");
 pub static GLYPH_TESSELLATION_EVALUATION_SHADER: &'static str = include_str!("glyph.tes.glsl");
 pub static GLYPH_VERTEX_SHADER: &'static str = include_str!("glyph.vs.glsl");
-pub static RESOLUTION_FRAGMENT_SHADER: &'static str = include_str!("resolve.fs.glsl");
-pub static RESOLUTION_VERTEX_SHADER: &'static str = include_str!("resolve.vs.glsl");
 
 const MAX_TEX_GEN_LEVEL: i32 = 32;
 

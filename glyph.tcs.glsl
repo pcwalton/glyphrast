@@ -4,28 +4,40 @@ layout(vertices = 2) out;
 
 out mat4 tcPoints[];
 
-#define ASSIGN_IF(n) \
-    if (pnext == n) \
-        p##n = ptmp;
-
 #define ASSIGN_TMP() \
     if (ptmp < 2500000.0) { \
-        ASSIGN_IF(0) \
-        else ASSIGN_IF(1) \
-        else ASSIGN_IF(2) \
-        else ASSIGN_IF(3) \
-        else ASSIGN_IF(4) \
-        else ASSIGN_IF(5) \
-        else ASSIGN_IF(6) \
-        else ASSIGN_IF(7) \
-        else ASSIGN_IF(8) \
-        else ASSIGN_IF(9) \
-        else ASSIGN_IF(10) \
-        else ASSIGN_IF(11) \
-        else ASSIGN_IF(12) \
-        else ASSIGN_IF(13) \
-        else ASSIGN_IF(14) \
-        else ASSIGN_IF(15) \
+        if (pnext == 0) \
+            p0 = ptmp; \
+        else if (pnext == 1) \
+            p1 = ptmp; \
+        else if (pnext == 2) \
+            p2 = ptmp; \
+        else if (pnext == 3) \
+            p3 = ptmp; \
+        else if (pnext == 4) \
+            p4 = ptmp; \
+        else if (pnext == 5) \
+            p5 = ptmp; \
+        else if (pnext == 6) \
+            p6 = ptmp; \
+        else if (pnext == 7) \
+            p7 = ptmp; \
+        else if (pnext == 8) \
+            p8 = ptmp; \
+        else if (pnext == 9) \
+            p9 = ptmp; \
+        else if (pnext == 10) \
+            p10 = ptmp; \
+        else if (pnext == 11) \
+            p11 = ptmp; \
+        else if (pnext == 12) \
+            p12 = ptmp; \
+        else if (pnext == 13) \
+            p13 = ptmp; \
+        else if (pnext == 14) \
+            p14 = ptmp; \
+        else if (pnext == 15) \
+            p15 = ptmp; \
         pnext++; \
     }
 
@@ -36,10 +48,10 @@ out mat4 tcPoints[];
     ASSIGN_TMP();
 
 #define SWAP(a, b) \
-    if (p##a > p##b) { \
-        ptmp = p##a; \
-        p##a = p##b; \
-        p##b = ptmp; \
+    if (a > b) { \
+        ptmp = a; \
+        a = b; \
+        b = ptmp; \
     }
 
 void main() {
@@ -88,80 +100,84 @@ void main() {
 
     // Bose-Nelson sorting network algorithm. Seems to be faster than a traditional sort on the
     // GPU.
-    SWAP(0, 1);
-    SWAP(2, 3);
-    SWAP(0, 2);
-    SWAP(1, 3);
-    SWAP(1, 2);
+    SWAP(p0, p1);
+    SWAP(p2, p3);
+    SWAP(p0, p2);
+    SWAP(p1, p3);
+    SWAP(p1, p2);
     if (pnext >= 4) {
-        SWAP(4, 5);
-        SWAP(6, 7);
-        SWAP(4, 6);
-        SWAP(5, 7);
-        SWAP(5, 6);
-        SWAP(0, 4);
-        SWAP(1, 5);
-        SWAP(1, 4);
-        SWAP(2, 6);
-        SWAP(3, 7);
-        SWAP(3, 6);
-        SWAP(2, 4);
-        SWAP(3, 5);
-        SWAP(3, 4);
+        SWAP(p4, p5);
+        SWAP(p6, p7);
+        SWAP(p4, p6);
+        SWAP(p5, p7);
+        SWAP(p5, p6);
+        SWAP(p0, p4);
+        SWAP(p1, p5);
+        SWAP(p1, p4);
+        SWAP(p2, p6);
+        SWAP(p3, p7);
+        SWAP(p3, p6);
+        SWAP(p2, p4);
+        SWAP(p3, p5);
+        SWAP(p3, p4);
         if (pnext >= 8) {
-            SWAP(8, 9);
-            SWAP(10, 11);
-            SWAP(8, 10);
-            SWAP(9, 11);
-            SWAP(9, 10);
-            SWAP(12, 13);
-            SWAP(14, 15);
-            SWAP(12, 14);
-            SWAP(13, 15);
-            SWAP(13, 14);
-            SWAP(8, 12);
-            SWAP(9, 13);
-            SWAP(9, 12);
-            SWAP(10, 14);
-            SWAP(11, 15);
-            SWAP(11, 14);
-            SWAP(10, 12);
-            SWAP(11, 13);
-            SWAP(11, 12);
-            SWAP(0, 8);
-            SWAP(1, 9);
-            SWAP(1, 8);
-            SWAP(2, 10);
-            SWAP(3, 11);
-            SWAP(3, 10);
-            SWAP(2, 8);
-            SWAP(3, 9);
-            SWAP(3, 8);
-            SWAP(4, 12);
-            SWAP(5, 13);
-            SWAP(5, 12);
-            SWAP(6, 14);
-            SWAP(7, 15);
-            SWAP(7, 14);
-            SWAP(6, 12);
-            SWAP(7, 13);
-            SWAP(7, 12);
-            SWAP(4, 8);
-            SWAP(5, 9);
-            SWAP(5, 8);
-            SWAP(6, 10);
-            SWAP(7, 11);
-            SWAP(7, 10);
-            SWAP(6, 8);
-            SWAP(7, 9);
-            SWAP(7, 8);
+            SWAP(p8, p9);
+            SWAP(p10, p11);
+            SWAP(p8, p10);
+            SWAP(p9, p11);
+            SWAP(p9, p10);
+            SWAP(p12, p13);
+            SWAP(p14, p15);
+            SWAP(p12, p14);
+            SWAP(p13, p15);
+            SWAP(p13, p14);
+            SWAP(p8, p12);
+            SWAP(p9, p13);
+            SWAP(p9, p12);
+            SWAP(p10, p14);
+            SWAP(p11, p15);
+            SWAP(p11, p14);
+            SWAP(p10, p12);
+            SWAP(p11, p13);
+            SWAP(p11, p12);
+            SWAP(p0, p8);
+            SWAP(p1, p9);
+            SWAP(p1, p8);
+            SWAP(p2, p10);
+            SWAP(p3, p11);
+            SWAP(p3, p10);
+            SWAP(p2, p8);
+            SWAP(p3, p9);
+            SWAP(p3, p8);
+            SWAP(p4, p12);
+            SWAP(p5, p13);
+            SWAP(p5, p12);
+            SWAP(p6, p14);
+            SWAP(p7, p15);
+            SWAP(p7, p14);
+            SWAP(p6, p12);
+            SWAP(p7, p13);
+            SWAP(p7, p12);
+            SWAP(p4, p8);
+            SWAP(p5, p9);
+            SWAP(p5, p8);
+            SWAP(p6, p10);
+            SWAP(p7, p11);
+            SWAP(p7, p10);
+            SWAP(p6, p8);
+            SWAP(p7, p9);
+            SWAP(p7, p8);
+        }
+    }
+    if (pnext >= 4) {
+        if (pnext >= 8) {
         }
     }
 
-    tcPoints[0][0] = vec4(p0, p1, p2, p3);
-    tcPoints[0][1] = vec4(p4, p5, p6, p7);
-    tcPoints[0][2] = vec4(p8, p9, p10, p11);
-    tcPoints[0][3] = vec4(p12, p13, p14, p15);
+    tcPoints[gl_InvocationID][0] = vec4(p0, p1, p2, p3);
+    tcPoints[gl_InvocationID][1] = vec4(p4, p5, p6, p7);
+    tcPoints[gl_InvocationID][2] = vec4(p8, p9, p10, p11);
+    tcPoints[gl_InvocationID][3] = vec4(p12, p13, p14, p15);
 
     gl_TessLevelOuter[0] = min(pnext, 16);
     gl_TessLevelOuter[1] = 1;
