@@ -15,8 +15,8 @@ use glium::index::{NoIndices, PrimitiveType};
 use glium::program::ProgramCreationInput;
 use glium::uniforms::UniformBuffer;
 use glium::vertex::EmptyInstanceAttributes;
-use glium::{Blend, BlendingFunction, DisplayBuild, DrawParameters, LinearBlendingFactor, Program};
-use glium::{Surface, VertexBuffer};
+use glium::{Blend, BlendingFunction, CapabilitiesSource, DisplayBuild, DrawParameters};
+use glium::{LinearBlendingFactor, Program, Surface, VertexBuffer};
 use glyphrast::{GLYPH_FRAGMENT_SHADER, GLYPH_TESSELLATION_CONTROL_SHADER};
 use glyphrast::{GLYPH_TESSELLATION_EVALUATION_SHADER, GLYPH_VERTEX_SHADER, GlyphOutlines};
 use glyphrast::{GlyphMetadata, GlyphParameters};
@@ -28,25 +28,28 @@ static STRING: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 
 // bad: BSas (S has 35 -- maybe related?)
 
-const RASTER_HEIGHT: f32 = 30.0;
+const RASTER_HEIGHT: f32 = 15.0;
 //const RASTER_HEIGHT: f32 = 1000.0;
 
 pub fn main() {
     let ref mut args = env::args();
 
-    if args.len() < 2 {
+    if args.len() < 3 {
         let exe = args.next().unwrap();
-        println!("Usage: {} font", exe);
+        println!("Usage: {} font size", exe);
         return
     }
 
     let ref font = args.nth(1).unwrap();
+    let size: usize = args.next().unwrap().parse().unwrap();
     let library = Library::init().unwrap();
 
     let display = WindowBuilder::new().with_gl(GlRequest::Specific(Api::OpenGl, (4, 1)))
                                       .build_glium()
                                       .unwrap();
     let window_size = display.get_window().as_ref().unwrap().get_inner_size_pixels().unwrap();
+
+    println!("vendor: {}", display.get_capabilities().vendor);
 
     let program = Program::new(&display, ProgramCreationInput::SourceCode {
         vertex_shader: GLYPH_VERTEX_SHADER,
@@ -66,7 +69,7 @@ pub fn main() {
         face.load_char(ch as usize, NO_SCALE).unwrap();
         parameters.push(GlyphParameters {
             face: face,
-            raster_height: RASTER_HEIGHT,
+            raster_height: size as f32,
             raster_origin: [(i * 24) as f32, 0.0],
         })
     }
@@ -76,7 +79,7 @@ pub fn main() {
         let mut target = display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
 
-        let glyph_raster_height = RASTER_HEIGHT as usize;
+        let glyph_raster_height = size;
 
         /*
         let mut glyph_heights = Box::new([0.0; 256]);
