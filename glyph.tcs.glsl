@@ -54,6 +54,22 @@ out mat4 tcPoints[];
         b = ptmp; \
     }
 
+#define ADJUST_WINDING(prev, this) \
+    newWinding = oldWinding + GetWinding(this); \
+    if (oldWinding != 0.0 && newWinding != 0.0) { \
+        pnext--; \
+        prev = this; \
+    } \
+    oldWinding = newWinding;
+
+float GetWinding(float value) {
+    if (value == 2500000.0)
+        return 0.0;
+    if (mod(value, 2.0) == 1.0)
+        return 1.0;
+    return -1.0;
+}
+
 void main() {
     gl_out[gl_InvocationID].gl_Position = vec4(gl_in[gl_InvocationID].gl_Position.xy, 0.0, 1.0);
     if (gl_InvocationID != 0)
@@ -169,10 +185,32 @@ void main() {
             SWAP(p7, p8);
         }
     }
+
+    float oldWinding;
+    float newWinding;
     if (pnext >= 4) {
         if (pnext >= 8) {
+            oldWinding = GetWinding(p15);
+            ADJUST_WINDING(p13, p14);
+            ADJUST_WINDING(p12, p13);
+            ADJUST_WINDING(p11, p12);
+            ADJUST_WINDING(p10, p11);
+            ADJUST_WINDING(p9, p10);
+            ADJUST_WINDING(p8, p9);
+            ADJUST_WINDING(p7, p8);
+        } else {
+            oldWinding = GetWinding(p8);
         }
+        ADJUST_WINDING(p6, p7);
+        ADJUST_WINDING(p5, p6);
+        ADJUST_WINDING(p4, p5);
+        ADJUST_WINDING(p3, p4);
+    } else {
+        oldWinding = GetWinding(p4);
     }
+    ADJUST_WINDING(p2, p3);
+    ADJUST_WINDING(p1, p2);
+    ADJUST_WINDING(p0, p1);
 
     tcPoints[gl_InvocationID][0] = vec4(p0, p1, p2, p3);
     tcPoints[gl_InvocationID][1] = vec4(p4, p5, p6, p7);

@@ -35,6 +35,15 @@ float RasterX(vec2 p0, vec2 p1, vec2 p3, float glyphY) {
     return 2500000.0;
 }
 
+// Returns true for clockwise winding and false for counterclockwise winding.
+bool Winding(vec2 p0, vec2 p3) {
+    return (p0.y == p3.y) ? (p0.x <= p3.x) : (p0.y < p3.y);
+}
+
+float Encode(float rasterX, float ySubpixel, bool winding) {
+    return round(rasterX * 16.0) * 32.0 + ySubpixel * 2.0 + (winding ? 1.0 : 0.0);
+}
+
 void main() {
     float y = float(gl_InstanceID);
     float glyphHeight = aGlyphHeight;
@@ -52,9 +61,8 @@ void main() {
     vec2 bp2 = aBP2 * scaleFactor;
     vec2 bp3 = aBP3 * scaleFactor;
 
-    // TODO(pcwalton): Use the last bit to encode winding.
-    float encodedRasterAX = round(RasterX(ap0, ap1, ap3, glyphY) * 16.0) * 32.0 + 31.0;
-    float encodedRasterBX = round(RasterX(bp0, bp1, bp3, glyphY) * 16.0) * 32.0 + 31.0;
+    float encodedRasterAX = Encode(RasterX(ap0, ap1, ap3, glyphY), 15.0, Winding(ap0, ap3));
+    float encodedRasterBX = Encode(RasterX(bp0, bp1, bp3, glyphY), 15.0, Winding(bp0, bp3));
     gl_Position = vec4(encodedRasterAX, rasterY, encodedRasterBX, 1.0);
 }
 
