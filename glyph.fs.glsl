@@ -1,18 +1,19 @@
 #version 410
 
-in vec3 vAAResult;
+in vec4 vAAResult;
 
 out vec4 oFragColor;
 
 void main() {
-    // Start with the vertical AA value.
-    float value = vAAResult.z;
+    float point0Spread = vAAResult.z;
+    float point1Spread = vAAResult.w;
 
-    // Compute the horizontal AA value.
-    if (abs(vAAResult.x - gl_FragCoord.x) < 1.0)
-        value *= 0.5 + (gl_FragCoord.x - vAAResult.x) / 2.0;
-    else if (abs(vAAResult.y - gl_FragCoord.x) < 1.0)
-        value *= 0.5 + (vAAResult.y - gl_FragCoord.x) / 2.0;
+    // Compute the AA coverage.
+    float value = 1.0;
+    /*if (gl_FragCoord.x < vAAResult.x + point0Spread)
+        value *= (gl_FragCoord.x - vAAResult.x) / point0Spread;
+    if (gl_FragCoord.x > vAAResult.y - point1Spread)
+        value *= (vAAResult.y - gl_FragCoord.x) / point1Spread;*/
 
     // Write in the color.
     oFragColor = vec4(value);

@@ -5,7 +5,7 @@ layout(isolines) in;
 uniform vec2 uWindowDimensions;
 
 in mat4 tcPoints[];
-out vec3 vAAResult;
+out vec4 vAAResult;
 
 float GetEncodedPoint(int pointIndex) {
     if (pointIndex == 0)
@@ -45,8 +45,8 @@ float GetLocation(float encodedPoint) {
     return floor(encodedPoint / 32.0) / 16.0;
 }
 
-float GetOpacity(float encodedPoint) {
-    return floor(mod(encodedPoint, 32.0) / 2.0) / 15.0;
+float GetSpread(float encodedPoint) {
+    return floor(floor(mod(encodedPoint, 32.0) / 2.0) / 4.0) - 2.0;
 }
 
 void main() {
@@ -58,14 +58,15 @@ void main() {
 
     float encodedPoint0 = GetEncodedPoint(tessIndex);
     float encodedPoint1 = GetEncodedPoint(tessIndex + 1);
-    vAAResult = vec3(GetLocation(encodedPoint0),
-                     GetLocation(encodedPoint1),
-                     GetOpacity(encodedPoint0));
+    float point0Location = GetLocation(encodedPoint0);
+    float point1Location = GetLocation(encodedPoint1);
+    /*float point0Spread = GetSpread(encodedPoint0);
+    float point1Spread = GetSpread(encodedPoint1);*/
+    float point0Spread = 0.0;
+    float point1Spread = 0.0;
+    vAAResult = vec4(point0Location, point1Location + point1Spread, point0Spread, point1Spread);
     float x = gl_TessCoord.x == 0.0 ? vAAResult.x : vAAResult.y;
     float y = gl_in[0].gl_Position.y;
-    gl_Position = vec4(mix(-1.0, 1.0, x / uWindowDimensions.x),
-                       mix(-1.0, 1.0, y / uWindowDimensions.y),
-                       0.0,
-                       1.0);
+    gl_Position = vec4(x, y, 0.0, 1.0);
 }
 
